@@ -34,7 +34,7 @@ test('should disallow after burst', async () => {
   expect(res5).toEqual({ isAllowed: true, limit: 5, remaining: 0, resetAt: 5000 })
 
   const res6 = await limiter.allow(key);
-  expect(res6).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 1000, resetAt: 1000 });
+  expect(res6).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 1000, resetAt: 5000 });
 
   advance(5001);
 
@@ -63,12 +63,12 @@ test('should disallow after burst for fractional tokens', async () => {
   expect(res5).toEqual({ isAllowed: true, limit: 5, remaining: 0, resetAt: 2500 })
 
   const res6 = await limiter.allow(key);
-  expect(res6).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 500, resetAt: 500 });
+  expect(res6).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 500, resetAt: 2500 });
 
   advance(200);
 
   const res7 = await limiter.allow(key);
-  expect(res7).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 300, resetAt: 500 })
+  expect(res7).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 300, resetAt: 2500 })
 
   advance(301);
 
@@ -98,7 +98,7 @@ test('should cap after burst', async () => {
   expect(res5).toEqual({ isAllowed: true, limit: 5, remaining: 0, resetAt: 5000 })
 
   const res6 = await limiter.allow(key);
-  expect(res6).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 1000, resetAt: 1000 });
+  expect(res6).toEqual({ isAllowed: false, reason: 'rate_limited', limit: 5, retryAfterMs: 1000, resetAt: 5000 });
 
   advance(60000);
 

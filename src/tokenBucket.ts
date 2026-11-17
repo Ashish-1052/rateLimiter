@@ -5,6 +5,8 @@ export class TokenBucketLimiter implements RateLimiter {
   private readonly capacity: number;
   private readonly refillPerSec: number;
   private readonly now: () => number;
+  private lastSweepAt: number;
+  private readonly sweepThreshold: number;
 
   constructor({ capacity, refillPerSec, now = Date.now }: TokenBucketOptions) {
     if (capacity <= 0 || refillPerSec <= 0) {
@@ -13,6 +15,8 @@ export class TokenBucketLimiter implements RateLimiter {
     this.capacity = capacity;
     this.refillPerSec = refillPerSec;
     this.now = now;
+    this.lastSweepAt = now();
+    this.sweepThreshold = Math.floor((capacity / refillPerSec) * 1000)
   }
 
   async allow(key: string, cost = 1): Promise<RateLimitResult> {
@@ -20,6 +24,7 @@ export class TokenBucketLimiter implements RateLimiter {
       throw new RangeError("cost exceeds bucket capacity");
     }
     const now = this.now();
+    this.sweep(now);
 
     let bucket = this.buckets.get(key);
     if (!bucket) {
@@ -33,12 +38,13 @@ export class TokenBucketLimiter implements RateLimiter {
 
     if (bucket.tokens < cost) {
       const retryAfterMs = Math.ceil(((cost - bucket.tokens) / this.refillPerSec) * 1000);
+      const msToFull = Math.ceil(((this.capacity - bucket.tokens) / this.refillPerSec) * 1000);
       return {
         isAllowed: false,
         reason: "rate_limited",
         limit: this.capacity,
         retryAfterMs,
-        resetAt: now + retryAfterMs,
+        resetAt: now + msToFull,
       };
     }
 
@@ -50,5 +56,15 @@ export class TokenBucketLimiter implements RateLimiter {
       remaining: Math.floor(bucket.tokens),
       resetAt: now + msToFull,
     };
+  }
+
+  sweep(now: number): void { // sweeps old keys
+    if (now - this.lastSweepAt < this.sweepThreshold) return;
+    for (const [key, bucket] of this.buckets) {
+      if (now - bucket.lastRefillAt >= this.sweepThreshold) {
+        this.buckets.delete(key);
+      }
+    }
+    this.lastSweepAt = now;
   }
 }

@@ -23,5 +23,17 @@ export interface RateLimiter {
 export interface TokenBucketOptions {
   capacity: number;
   refillPerSec: number;
+  now?(): number;
+}
+
+export interface SlidingWindowOptions {
+  windowMs: number;
+  capacity: number;
   now?: () => number;
+}
+
+export interface Window {
+  windowStart: number, // date
+  windowCount: number,
+  prevWindowCount: number,
 }
