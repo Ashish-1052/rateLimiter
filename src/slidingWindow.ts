@@ -1,6 +1,6 @@
 import type { RateLimiter, RateLimitResult, SlidingWindowOptions, Window } from "./types.js";
 
-export class SlidingWindow implements RateLimiter {
+export class SlidingWindowLimiter implements RateLimiter {
   private readonly windowMs: number;
   private readonly now: () => number;
   private readonly windows = new Map<string, Window>();

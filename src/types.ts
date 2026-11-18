@@ -37,3 +37,7 @@ export interface Window {
   windowCount: number,
   prevWindowCount: number,
 }
+
+export type LimiterConfig =
+  | { algorithm: "tokenBucket"; capacity: number; refillPerSec: number }
+  | { algorithm: "slidingWindow"; capacity: number; windowMs: number };
