@@ -1,3 +1,5 @@
+import type { Redis } from "ioredis";
+
 // src/types.ts
 export type RateLimitResult =
   | {
@@ -24,6 +26,16 @@ export interface TokenBucketOptions {
   capacity: number;
   refillPerSec: number;
   now?(): number;
+}
+
+export interface RedisTokenBucketOptions {
+  capacity: number;
+  refillPerSec: number;
+  now?(): number;
+  redis: Redis;
+  failureMode?: "open" | "closed";   // default "open"
+  failureRetryAfterMs?: number;      // default 1000, used when closed
+  onError?: (err: unknown) => void;
 }
 
 export interface SlidingWindowOptions {

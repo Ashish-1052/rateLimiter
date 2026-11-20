@@ -19,7 +19,7 @@ export class TokenBucketLimiter implements RateLimiter {
     this.sweepThreshold = Math.floor((capacity / refillPerSec) * 1000)
   }
 
-  async allow(key: string, cost = 1): Promise<RateLimitResult> {
+  async allow(key: string, cost: number = 1): Promise<RateLimitResult> {
     if (cost > this.capacity) {
       throw new RangeError("cost exceeds bucket capacity");
     }
