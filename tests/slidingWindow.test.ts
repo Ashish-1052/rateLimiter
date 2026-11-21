@@ -1,4 +1,4 @@
-import { expect, test, describe } from "vitest";
+import { expect, test } from "vitest";
 import { SlidingWindowLimiter } from "../src/slidingWindow.js";
 
 function setup(capacity = 100, windowMs = 1000) {

@@ -1,11 +1,11 @@
 import { expect, test } from "vitest";
-import { RedisTokenBucket } from "../src/redisTokenBucket.js";
+import { RedisTokenBucketLimiter } from "../src/redisTokenBucket.js";
 import { Redis } from "ioredis";
 
 const redis = new Redis('redis://localhost:6380')
 function setup(capacity = 100, refillPerSec = 5) {
   let t = 0;
-  const limiter = new RedisTokenBucket({ capacity, refillPerSec, now: () => t, redis });
+  const limiter = new RedisTokenBucketLimiter({ capacity, refillPerSec, now: () => t, redis });
   return { limiter, advance: (ms: number) => { t += ms; }, now: () => t };
 }
 

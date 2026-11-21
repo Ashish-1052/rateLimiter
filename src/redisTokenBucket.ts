@@ -1,15 +1,14 @@
-// src/redisTokenBucket.ts
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { Redis } from "ioredis";
 import type { RateLimiter, RateLimitResult, RedisTokenBucketOptions } from "./types.js";
 
 const LUA_SOURCE = readFileSync(
-  fileURLToPath(new URL("../scripts/tokenBucket.lua", import.meta.url)),
+  fileURLToPath(new URL("../scripts/luaFunctions.lua", import.meta.url)),
   "utf8",
 );
 
-export class RedisTokenBucket implements RateLimiter {
+export class RedisTokenBucketLimiter implements RateLimiter {
   private readonly redis: Redis;
   private readonly capacity: number;
   private readonly refillPerSec: number;
@@ -75,7 +74,7 @@ export class RedisTokenBucket implements RateLimiter {
     }
   }
 
-  async callScript(key: string, cost: number = 1): Promise<RateLimitResult> {
+  private async callScript(key: string, cost: number = 1): Promise<RateLimitResult> {
     const nowArg = this.now ? String(this.now()) : ""; // "" tells Lua to use Redis TIME
     const redisKey = `${this.keyPrefix}${key}`;
 

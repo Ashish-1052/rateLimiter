@@ -1,4 +1,4 @@
-import type { Redis } from "ioredis";
+import { Redis } from "ioredis";
 
 // src/types.ts
 export type RateLimitResult =
@@ -38,6 +38,16 @@ export interface RedisTokenBucketOptions {
   onError?: (err: unknown) => void;
 }
 
+export interface RedisSlidingWindowOptions {
+  capacity: number;
+  windowMs: number;
+  now?(): number;
+  redis: Redis;
+  failureMode?: "open" | "closed";   // default "open"
+  failureRetryAfterMs?: number;      // default 1000, used when closed
+  onError?: (err: unknown) => void;
+}
+
 export interface SlidingWindowOptions {
   windowMs: number;
   capacity: number;
@@ -51,5 +61,7 @@ export interface Window {
 }
 
 export type LimiterConfig =
-  | { algorithm: "tokenBucket"; capacity: number; refillPerSec: number }
-  | { algorithm: "slidingWindow"; capacity: number; windowMs: number };
+  | { algorithm: "tokenBucket"; capacity: number; refillPerSec: number, backend: 'memory' }
+  | { algorithm: "tokenBucket"; capacity: number; refillPerSec: number, backend: 'redis', redis: Redis }
+  | { algorithm: "slidingWindow"; capacity: number; windowMs: number, backend: 'memory' }
+  | { algorithm: "slidingWindow"; capacity: number; windowMs: number, backend: 'redis', redis: Redis };
