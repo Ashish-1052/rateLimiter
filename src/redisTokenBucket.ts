@@ -51,7 +51,6 @@ export class RedisTokenBucketLimiter implements RateLimiter {
     if (cost > this.capacity) {
       throw new RangeError("cost exceeds bucket capacity");
     }
-    await this.ensureLoaded();
     try {
         return await this.execute(key, cost);
       } catch (err) {

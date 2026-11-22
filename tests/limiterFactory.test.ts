@@ -9,8 +9,8 @@ function setup(config: LimiterConfig) {
 }
 
 test('should return bucket limiter', async () => {
-  const { limiter: limiterBucket, advance: advanceBucket, now: nowBucket } = setup({ algorithm: 'tokenBucket', capacity: 5, refillPerSec: 2 });
-  const { limiter: limiterSlidingWindow, advance: advanceSlidingWindow, now: nowSlidingWindow } = setup({ algorithm: 'slidingWindow', capacity: 5, windowMs: 1000 });
+  const { limiter: limiterBucket, advance: advanceBucket, now: nowBucket } = setup({ algorithm: 'tokenBucket', capacity: 5, refillPerSec: 2, backend: 'memory' });
+  const { limiter: limiterSlidingWindow, advance: advanceSlidingWindow, now: nowSlidingWindow } = setup({ algorithm: 'slidingWindow', capacity: 5, windowMs: 1000, backend: 'memory' });
 
   const key = 'test-123';
 
