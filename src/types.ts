@@ -1,4 +1,5 @@
 import { Redis } from "ioredis";
+import type { Request, Response, NextFunction } from "express"
 
 // src/types.ts
 export type RateLimitResult =
@@ -65,3 +66,17 @@ export type LimiterConfig =
   | { algorithm: "tokenBucket"; capacity: number; refillPerSec: number, backend: 'redis', redis: Redis }
   | { algorithm: "slidingWindow"; capacity: number; windowMs: number, backend: 'memory' }
   | { algorithm: "slidingWindow"; capacity: number; windowMs: number, backend: 'redis', redis: Redis };
+
+  export interface RateLimitHeaders {
+    'X-RateLimit-Limit': string;
+    'X-RateLimit-Remaining'?: string;
+    'X-RateLimit-Reset': string;
+    'Retry-After'?: string;
+  }
+
+export type HttpResult = { status: number, headers?: RateLimitHeaders, body?: unknown }
+
+export interface RateLimitOptions {
+  limiter: RateLimiter,
+  keyFn: (req: Request) => string
+}
